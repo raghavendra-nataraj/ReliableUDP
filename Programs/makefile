@@ -1,0 +1,39 @@
+CC = gcc
+TFLAGS = -DTIMEOUT
+DAFLAGS = -DDUPACK
+all: server client clean run
+
+
+ifeq ($(DEBUG),yes)
+DFLAGS = -DDEBUG
+endif 
+
+ifeq ($(BONUS),WA)
+BFLAG = -DWRAPUP
+endif
+
+ifeq ($(OPTION),dupack)
+FLAG = $(DAFLAGS)
+endif
+ifeq ($(OPTION),timeout)
+FLAG = $(TFLAGS)
+endif
+ifeq ($(OPTION),dupandtimeout)
+FLAG = $(DAFLAGS) $(TFLAGS)
+endif
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(FLAG) $(DFLAGS) $(BFLAG)
+
+server: Server.o Helper.o TCPHeader.o SlidingWindow.o
+	$(CC) -o $@ Server.o Helper.o TCPHeader.o SlidingWindow.o -lpthread
+
+client: Client.o Helper.o TCPHeader.o SlidingWindow.o
+	$(CC) -o $@ Client.o Helper.o TCPHeader.o SlidingWindow.o -lpthread
+
+clean:
+	rm *.o
+
+run:
+	./server 51717 30
+
